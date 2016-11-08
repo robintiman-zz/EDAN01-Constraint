@@ -29,6 +29,7 @@ public class Burger {
 		DepthFirstSearch<IntVar> dfs = new DepthFirstSearch<IntVar>();
 		
 		
+		
 	}
 	
 }
