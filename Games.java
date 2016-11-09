@@ -34,6 +34,7 @@ public class Games {
 		 int refill = 2;
 		 int[] fun = {4, 1, -2, 3, 4};
 
+
 		Store store = new Store();
 		IntVar[] games = new IntVar[num];
 		IntVar[] tokens = new IntVar[num];
@@ -68,7 +69,7 @@ public class Games {
 
 			// t[i-1] - g[i-1] + refill = t[i] =>
 			// refill = t[i] - t[i-1] + g[i-1]
-			IntVar temp = new IntVar(store, "Diff" + (i+1), refill, cap);
+			IntVar temp = new IntVar(store, "Diff" + (i+1), 0, cap+refill);
 			store.impose(new LinearInt(store,
 			new IntVar[] { temp, tokens[i-1], games[i-1]},
 			new int[] { 1, -1, 1 },
@@ -90,7 +91,7 @@ public class Games {
 		IntVar funSum = new IntVar(store, "funSum", -1000, 1000);
 
 		// Create an array to be able to do a LinearInt constraint as:
-		// G1 * F1 + G2 * F2 +... + funSum * 1 ==
+		// G1 * F1 + G2 * F2 +... + funSum * 1 == 0
 		IntVar[] tempArr = new IntVar[num + 1];
 		int[] tempFun = new int[num + 1];
 
