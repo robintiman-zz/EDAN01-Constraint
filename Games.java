@@ -13,6 +13,9 @@ public class Games {
 	}
 
 	static void send() {
+		// States whether skipping at most one game should be allowed
+		boolean skip = false;
+
 		// Input 1
 		//int num = 4;
 		//int cap = 5;
@@ -36,6 +39,9 @@ public class Games {
 		IntVar[] games = new IntVar[num];
 		IntVar[] tokens = new IntVar[num];
 
+
+
+
         // Introduce helper variable refillVar (to simplify constraints later)
         IntVar refillVar = new IntVar(store, "R", 1, cap);
         store.impose(new XeqC(refillVar, refill));
@@ -45,10 +51,23 @@ public class Games {
 
         // Initialize variables
         for(int i = 0; i < num; i++) {
-            games[i] = new IntVar(store, "G" + (i+1), 1, cap);
+            games[i] = new IntVar(store, "G" + (i+1), 0, cap);
 			tokens[i] = new IntVar(store, "T" + (i+1), refill, cap);
 
         }
+		if(skip) {
+			IntVar count = new IntVar(store, "count", 0, num);
+			Among among = new Among(games, new IntervalDomain(0,0), count);
+			store.impose(among);
+			store.impose(new XlteqC(count, 1));
+		} else {
+			IntVar count = new IntVar(store, "count", 0, num);
+			Among among = new Among(games, new IntervalDomain(0,0), count);
+			store.impose(among);
+			store.impose(new XlteqC(count, 0));
+		}
+
+
 
         // Initialize constraints for i=0
         store.impose(new XlteqY(games[0], tokens[0]));
