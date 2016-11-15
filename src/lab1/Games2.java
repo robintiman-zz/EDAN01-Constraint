@@ -1,10 +1,12 @@
 package lab1;
 
+import org.jacop.constraints.Among;
 import org.jacop.constraints.LinearInt;
 import org.jacop.constraints.Min;
 import org.jacop.constraints.XeqC;
 import org.jacop.constraints.XlteqY;
 import org.jacop.core.IntVar;
+import org.jacop.core.IntervalDomain;
 import org.jacop.core.Store;
 import org.jacop.search.DepthFirstSearch;
 import org.jacop.search.IndomainMin;
