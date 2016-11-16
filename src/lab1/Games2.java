@@ -1,8 +1,21 @@
-import org.jacop.constraints.*;
-import org.jacop.core.*;
-import org.jacop.search.*;
+package lab1;
 
-public class Games {
+import org.jacop.constraints.Among;
+import org.jacop.constraints.LinearInt;
+import org.jacop.constraints.Min;
+import org.jacop.constraints.XeqC;
+import org.jacop.constraints.XlteqY;
+import org.jacop.core.IntVar;
+import org.jacop.core.IntervalDomain;
+import org.jacop.core.Store;
+import org.jacop.search.DepthFirstSearch;
+import org.jacop.search.IndomainMin;
+import org.jacop.search.PrintOutListener;
+import org.jacop.search.Search;
+import org.jacop.search.SelectChoicePoint;
+import org.jacop.search.SimpleSelect;
+
+public class Games2 {
 	public static void main(String[] args) {
 		long T1, T2, T;
 		T1 = System.currentTimeMillis();
@@ -99,7 +112,8 @@ public class Games {
 			tempArr[i] = games[i];
 			tempFun[i] = fun[i];
 		}
-
+		
+		System.out.println(store.toString());
 		tempArr[num] = funSum;
 		tempFun[num] = 1;
 		store.impose(new LinearInt(store, tempArr, tempFun, "==", 0));
