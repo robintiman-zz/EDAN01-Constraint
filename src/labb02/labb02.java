@@ -8,14 +8,14 @@ import java.util.*;
 public class labb02 {
     public static void main(String[] args) {
         // Input variables 1
-        int graph_size = 6;
-        int start = 1;
-        int n_dests = 1;
-        int [] dest = {6};
-        int n_edges = 7;
-        int [] from = {1,1,2,2,3,4,4};
-        int [] to = {2,3,3,4,5,5,6};
-        int [] cost = {4,2,5,10,3,4,11};
+        // int graph_size = 6;
+        // int start = 1;
+        // int n_dests = 1;
+        // int [] dest = {6};
+        // int n_edges = 7;
+        // int [] from = {1,1,2,2,3,4,4};
+        // int [] to = {2,3,3,4,5,5,6};
+        // int [] cost = {4,2,5,10,3,4,11};
 
         // // Input variables 2
         // int graph_size = 6;
@@ -28,14 +28,14 @@ public class labb02 {
         // int [] cost = {4,2,5,10,3,4,11};
 
         // // Input variables 3
-        // int graph_size = 6;
-        // int start = 1;
-        // int n_dests = 2;
-        // int [] dest = {5,6};
-        // int n_edges = 9;
-        // int [] from = {1,1,1,2,2,3,3,3,4};
-        // int [] to = {2,3,4,3,5,4,5,6,6};
-        // int [] cost = {6,1,5,5,3,5,6,4,2};
+        int graph_size = 6;
+        int start = 1;
+        int n_dests = 2;
+        int [] dest = {5,6};
+        int n_edges = 9;
+        int [] from = {1,1,1,2,2,3,3,3,4};
+        int [] to = {2,3,4,3,5,4,5,6,6};
+        int [] cost = {6,1,5,5,3,5,6,4,2};
 
         Store store = new Store();
         IntVar totalCost = new IntVar(store, "totalCost", -1000, 1000);
@@ -47,7 +47,7 @@ public class labb02 {
                 // Create new intVar
                 edges[i][j] = new IntVar(store, "edge_" + (i+1) + "_" + (j+1));
 
-                if (j != 0){
+                if (j != (start - 1)){
                     // If not destination, add itself to domain
                     if (j != dest[i]-1) {
                             edges[i][j].addDom(j+1, j+1);
@@ -65,20 +65,10 @@ public class labb02 {
             }
         }
 
-        // PRINT STUFF
-        for(int i = 0; i < n_dests; i++) {
-            for(int j = 0; j < graph_size; j++) {
-                System.out.print(edges[i][j].toString());
-            }
-            System.out.println();
-        }
-
-
-
         // Specifies whether edge number i is included in solution
         BooleanVar[] edgeIncluded = new BooleanVar[n_edges];
         for (int i = 0; i < n_edges; i++) {
-            edgeIncluded[i] = new BooleanVar(store);
+            edgeIncluded[i] = new BooleanVar(store, "Edge_"+i);
         }
 
         for(int j = 0; j < n_edges; j++) {
@@ -103,7 +93,7 @@ public class labb02 {
         boolean result = search.labeling(store, select, totalCost);
         if (result) {
 			System.out.println("\n*** Yes");
-			System.out.println("Solution : "+ java.util.Arrays.asList(edges));
+			System.out.println("Solution (included edges) : " + java.util.Arrays.asList(edgeIncluded));
 			System.out.println("The total cost is: " + (totalCost.value()));
 		}
 		else System.out.println("\n*** No");
