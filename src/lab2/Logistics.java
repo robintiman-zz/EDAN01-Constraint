@@ -1,6 +1,11 @@
 package lab2;
 
+import java.util.ArrayList;
+
+import org.jacop.constraints.IfThenElse;
+import org.jacop.constraints.LinearInt;
 import org.jacop.constraints.Subcircuit;
+import org.jacop.constraints.XeqC;
 import org.jacop.constraints.XneqC;
 import org.jacop.core.IntVar;
 import org.jacop.core.Store;
@@ -26,39 +31,71 @@ public class Logistics {
 		Store store = new Store();
 
 		// We seek to minimize cost
-		IntVar cost = new IntVar(store, "cost", 0, 50);
+		IntVar cost = new IntVar(store, "cost", 1, 50);
 
 		// Setup FDVs
 		IntVar[] v = new IntVar[graph_size];
 		for (int i = 0; i < graph_size; i++) {
-			v[i] = new IntVar(store, "city" + i, i, i);
+			v[i] = new IntVar(store, "city" + (i + 1), i + 1, i + 1);
 		}
 
 		// Add domains
 		for (int i = 0; i < n_edges; i++) {
-			v[from[i] - 1].addDom(to[i] - 1, to[i] - 1);
-			v[to[i] - 1].addDom(from[i] - 1, from[i] - 1);
+			v[from[i] - 1].addDom(to[i], to[i]);
+			v[to[i] - 1].addDom(from[i], from[i]);
 		}
+		v[5].addDom(start, start);
 
-		// Start and dests can't point to themselves because they must be in 
-		// the solution.
-		store.impose(new XneqC(v[start-1], start-1));
-		for (int d : dest) {
-			store.impose(new XneqC(v[d-1], d-1));
+		IntVar[] c = new IntVar[n_edges + 1];
+		int[] weights = new int[n_edges + 1];
+		for (int i = 0; i < n_edges; i++) {
+			c[i] = new IntVar(store, "cost" + (i + 1), 0, 0);
+			c[i].addDom(cost_arr[i], cost_arr[i]);
+			weights[i] = 1;
 		}
+		c[n_edges] = cost;
+		weights[n_edges] = -1;
+
+		for (int node = 1; node <= graph_size; node++) {
+			// store.impose(new IfThenElse(new XeqC(v[n1-1], n1), new
+			// XeqC(c[n1-1], 0),
+			// new XeqC(c[n1-1], cost_arr[i])));
+			ArrayList<Integer> node_edges = new ArrayList<Integer>();
+			for (int i = 0; i < n_edges; i++) {
+				if (from[i] == node)
+					node_edges.add(i);
+				if (to[i] == node)
+					node_edges.add(i);
+			}
+
+			for (int e : node_edges) {
+				store.impose(new IfThenElse(new XeqC(v[node-1], node), 
+						new XeqC(c[e], 0), new XeqC(c[e], cost_arr[e])));
+
+			}
+		}
+		store.impose(new LinearInt(store, c, weights, "==", 0));
+
 		store.impose(new Subcircuit(v));
+		// Start and dests can't point to themselves because they must be in
+		// the solution.
+		store.impose(new XneqC(v[start - 1], start));
+		for (int d : dest) {
+			store.impose(new XneqC(v[d - 1], d));
+		}
 
-		// Find solution 
+//		System.out.println(store.toString() + "\n*************");
+
+		// Find solution
 		long T1, T2;
 		T1 = System.currentTimeMillis();
-		Search<IntVar> label = new DepthFirstSearch<IntVar>();
-		SelectChoicePoint<IntVar> select = new SimpleSelect<IntVar>(v, null,
-				new IndomainMin<IntVar>());
-		label.setSolutionListener(new PrintOutListener<IntVar>());
-		label.setAssignSolution(true);
-		label.setPrintInfo(true);
-		label.getSolutionListener().searchAll(true);
-		boolean res = label.labeling(store, select);
+		Search<IntVar> search = new DepthFirstSearch<IntVar>();
+		SelectChoicePoint<IntVar> select = new SimpleSelect<IntVar>(v, null, new IndomainMin<IntVar>());
+		search.setSolutionListener(new PrintOutListener<IntVar>());
+		// search.setAssignSolution(true);
+		// search.setPrintInfo(true);
+		// search.getSolutionListener().searchAll(true);
+		boolean res = search.labeling(store, select, cost);
 		T2 = System.currentTimeMillis();
 		System.out.println("");
 		System.out.println("\n\t*** Execution time = " + (T2 - T1) + " ms");
@@ -66,10 +103,9 @@ public class Logistics {
 		if (res) {
 			System.out.println("*** Yes");
 			System.out.println(java.util.Arrays.asList(v));
-			IntVar[] theSolution = label.getVariables();
-			System.out.println("getVariables " + java.util.Arrays.asList(theSolution));
-		} else
+		} else {
 			System.out.println("*** No");
+		}
 	}
 
 	public static void main(String[] args) {

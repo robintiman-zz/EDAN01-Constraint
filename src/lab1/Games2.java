@@ -112,7 +112,8 @@ public class Games2 {
 			tempArr[i] = games[i];
 			tempFun[i] = fun[i];
 		}
-
+		
+		System.out.println(store.toString());
 		tempArr[num] = funSum;
 		tempFun[num] = 1;
 		store.impose(new LinearInt(store, tempArr, tempFun, "==", 0));
