@@ -1,3 +1,4 @@
+package lab2_1;
 
 
 import org.jacop.constraints.*;
@@ -5,7 +6,7 @@ import org.jacop.core.*;
 import org.jacop.search.*;
 import java.util.*;
 
-public class labb02 {
+public class Logistics {
     public static void main(String[] args) {
         // Input variables 1
         // int graph_size = 6;
