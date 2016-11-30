@@ -66,7 +66,8 @@ public class SimpleDFS {
 	int depth = 0;
 
 	/**
-	 * It represents the cost value of currently best solution for FloatVar cost.
+	 * It represents the cost value of currently best solution for FloatVar
+	 * cost.
 	 */
 	public int costValue = IntDomain.MaxInt;
 
@@ -124,7 +125,8 @@ public class SimpleDFS {
 
 				reportSolution();
 
-				return costVariable == null; // true is satisfiability search and false if minimization
+				return costVariable == null; // true is satisfiability search
+												// and false if minimization
 			}
 
 			choice = new ChoicePoint(vars);
@@ -235,20 +237,12 @@ public class SimpleDFS {
 			return (v.min() + v.max()) / 2;
 		}
 
-	/**
-	 * example constraint assigning a selected value
-	 */
-	public PrimitiveConstraint getConstraint() {
-	    return new XlteqC(var, value);
-		// return new XgteqC(var, value);
+		/**
+		 * example constraint assigning a selected value
+		 */
+		public PrimitiveConstraint getConstraint() {
+			return new XlteqC(var, value);
+			// return new XgteqC(var, value);
+		}
 	}
 }
-}
-
-
-
-
-
-
-
-
