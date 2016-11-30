@@ -35,6 +35,7 @@ import org.jacop.constraints.PrimitiveConstraint;
 import org.jacop.constraints.XeqC;
 import org.jacop.constraints.XgteqC;
 import org.jacop.constraints.XlteqC;
+import org.jacop.search.MaxRegret;
 import org.jacop.core.FailException;
 import org.jacop.core.IntDomain;
 import org.jacop.core.IntVar;
@@ -204,7 +205,7 @@ public class VariableSelect {
 
 		public ChoicePoint(IntVar[] v) {
 			//var = selectVariable(v);
-			var = selectVariable(v, smallest(v));
+			var = selectVariable(v, smallestDom(v));
 			value = selectValue(var);
 		}
 
@@ -213,6 +214,7 @@ public class VariableSelect {
 		}
 
 		
+		// Return index of variable with smallest min value
 		int smallest(IntVar[] v) {
 		
 			IntVar temp = null;
@@ -226,21 +228,61 @@ public class VariableSelect {
 			return index;
 		}
 		
+		// Return index of variable with smallest domain
+		int smallestDom(IntVar[] v) {			
+			IntVar temp = null;
+			int index = 0;
+			for(int i = 0; i < v.length; i++) {
+				if (temp == null || v[i].getSize() < temp.getSize()) {
+					temp = v[i];
+					index = i;
+				}
+			}
+			return index;
+		}
+		
+		int smallestMax(IntVar[] v) {
+			IntVar temp = null;
+			int index = 0;
+			for(int i = 0; i < v.length; i++) {
+				if (temp == null || v[i].max() < temp.max()) {
+					temp = v[i];
+					index = i;
+				}
+			}
+			return index;
+		}
+		
+		int maxRegret(IntVar[] v) {
+			MaxRegret comp = new MaxRegret();
+			IntVar temp = null;
+			int index = 0;
+			for(int i = 0; i < v.length; i++) {
+				if (temp == null || comp.compare(v[i], temp) == 1 ) {
+					temp = v[i];
+					index = i;
+				}
+			}
+			return index;
+		}
+	
 		/**
 		 * example variable selection; input order
 		 */
 		IntVar selectVariable(IntVar[] v, int index) {
 			if (v.length != 0) {
 				ArrayList<IntVar> vList = new ArrayList<IntVar>(v.length);
-
+				
 				  for (int i = 0; i < v.length; i++) {
 				    vList.add(v[i]);
 				  }
-				
-				IntVar val = vList.remove(index);
-				searchVariables = vList.toArray(new IntVar[vList.size()]);
-				
-				return val;
+				if(vList.get(index).getSize() == 1) {
+					IntVar val = vList.remove(index);
+					searchVariables = vList.toArray(new IntVar[vList.size()]);
+					return val;
+				} else {
+					return vList.get(index);
+				}
 			} else {
 				System.err.println("Zero length list of variables for labeling");
 				return new IntVar(store);

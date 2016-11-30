@@ -215,14 +215,19 @@ public class SplitSearch2 {
 		 */
 		IntVar selectVariable(IntVar[] v) {
 			if (v.length != 0) {
-
-				searchVariables = new IntVar[v.length - 1];
-				for (int i = 0; i < v.length - 1; i++) {
-					searchVariables[i] = v[i + 1];
+				if (v[0].getSize() == 1) {
+					searchVariables = new IntVar[v.length - 1];
+					for (int i = 0; i < v.length - 1; i++) {
+						searchVariables[i] = v[i + 1];
+					}
+				} else {
+					searchVariables = new IntVar[v.length];
+					for (int i = 0; i < v.length - 1; i++) {
+						searchVariables[i] = v[i + 1];
+					}
+					searchVariables[v.length -1] = v[0];
 				}
-
 				return v[0];
-
 			} else {
 				System.err.println("Zero length list of variables for labeling");
 				return new IntVar(store);
