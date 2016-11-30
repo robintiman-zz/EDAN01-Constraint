@@ -36,6 +36,7 @@ import org.jacop.constraints.Alldiff;
 import org.jacop.constraints.XeqC;
 import org.jacop.constraints.XltY;
 import org.jacop.constraints.XlteqC;
+import org.jacop.constraints.XgteqC;
 import org.jacop.constraints.XplusClteqZ;
 import org.jacop.constraints.XplusYeqZ;
 import org.jacop.core.IntVar;
@@ -169,7 +170,7 @@ public class Golomb {
 
 	IntVar cost = numbers[numbers.length - 1];
 
-	SimpleDFS search = new SimpleDFS(store);
+	SplitSearch2 search = new SplitSearch2(store);
 	search.setVariablesToReport(numbers);
 	search.setCostVariable(cost);
 
