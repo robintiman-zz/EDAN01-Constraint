@@ -106,9 +106,9 @@ public class Logistics {
 		//		search.setAssignSolution(true);
 		// search.setPrintInfo(true);
 		//		search.getSolutionListener().searchAll(true);
-		//		search.printAllSolutions();
+		search.printAllSolutions();
 		search.setOptimize(true);
-		boolean res = search.labeling(store, select, cost);
+		boolean res = search.labeling(store, select);
 		T2 = System.currentTimeMillis();
 		System.out.println("");
 		System.out.println("\n\t*** Execution time = " + (T2 - T1) + " ms");
