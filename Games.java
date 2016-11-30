@@ -28,6 +28,7 @@ public class Games {
 		//int refill = 2;
 		//int[] fun = {4, -1, -2, 3};
 
+
 		// Input 3
 		 int num = 5;
 		 int cap = 3;
@@ -69,7 +70,7 @@ public class Games {
 
 			// t[i-1] - g[i-1] + refill = t[i] =>
 			// refill = t[i] - t[i-1] + g[i-1]
-			IntVar temp = new IntVar(store, "Diff" + (i+1), 0, cap+refill);
+			IntVar temp = new IntVar(store, "Diff" + (i+1), 0, cap + refill);
 			store.impose(new LinearInt(store,
 			new IntVar[] { temp, tokens[i-1], games[i-1]},
 			new int[] { 1, -1, 1 },
