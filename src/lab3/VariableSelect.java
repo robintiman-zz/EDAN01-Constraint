@@ -205,7 +205,7 @@ public class VariableSelect {
 
 		public ChoicePoint(IntVar[] v) {
 			//var = selectVariable(v);
-			var = selectVariable(v, smallestDom(v));
+			var = selectVariable(v);
 			value = selectValue(var);
 		}
 
@@ -213,23 +213,22 @@ public class VariableSelect {
 			return searchVariables;
 		}
 
-		
+
 		// Return index of variable with smallest min value
-		int smallest(IntVar[] v) {
-		
-			IntVar temp = null;
+		IntVar smallest(IntVar[] v) {
+			IntVar temp = v[0];
 			int index = 0;
-			for(int i = 0; i < v.length; i++) {
-				if (temp == null || v[i].min() < temp.min()) {
+			for(int i = 1; i < v.length; i++) {
+				if (v[i].min() < temp.min()) {
 					temp = v[i];
 					index = i;
 				}
 			}
-			return index;
+			return selectVariable(v, index);
 		}
-		
+
 		// Return index of variable with smallest domain
-		int smallestDom(IntVar[] v) {			
+		IntVar smallestDom(IntVar[] v) {
 			IntVar temp = null;
 			int index = 0;
 			for(int i = 0; i < v.length; i++) {
@@ -238,10 +237,10 @@ public class VariableSelect {
 					index = i;
 				}
 			}
-			return index;
+			return selectVariable(v, index);
 		}
-		
-		int smallestMax(IntVar[] v) {
+
+		IntVar smallestMax(IntVar[] v) {
 			IntVar temp = null;
 			int index = 0;
 			for(int i = 0; i < v.length; i++) {
@@ -250,10 +249,10 @@ public class VariableSelect {
 					index = i;
 				}
 			}
-			return index;
+			return selectVariable(v, index);
 		}
-		
-		int maxRegret(IntVar[] v) {
+
+		IntVar maxRegret(IntVar[] v) {
 			MaxRegret comp = new MaxRegret();
 			IntVar temp = null;
 			int index = 0;
@@ -263,30 +262,40 @@ public class VariableSelect {
 					index = i;
 				}
 			}
-			return index;
+			return selectVariable(v, index);
 		}
-	
+
+		IntVar selectVariable(IntVar[] v) {
+			return smallest(v);
+		}
+
 		/**
 		 * example variable selection; input order
 		 */
 		IntVar selectVariable(IntVar[] v, int index) {
-			if (v.length != 0) {
+
+
+						if (v.length != 0) {
 				ArrayList<IntVar> vList = new ArrayList<IntVar>(v.length);
-				
-				  for (int i = 0; i < v.length; i++) {
-				    vList.add(v[i]);
-				  }
+				for (int i = 0; i < v.length; i++) {
+					vList.add(v[i]);
+				}
 				if(vList.get(index).getSize() == 1) {
 					IntVar val = vList.remove(index);
 					searchVariables = vList.toArray(new IntVar[vList.size()]);
 					return val;
 				} else {
+					searchVariables = new IntVar[v.length];
+          			for (int i = 0; i < v.length; i++) {
+            			searchVariables[i] = v[i];
+					}
 					return vList.get(index);
 				}
 			} else {
 				System.err.println("Zero length list of variables for labeling");
 				return new IntVar(store);
 			}
+
 		}
 
 		/**
@@ -301,7 +310,7 @@ public class VariableSelect {
 	 */
 	public PrimitiveConstraint getConstraint() {
 	    //return new XlteqC(var, value);
-		return new XgteqC(var, value);
+		return new XlteqC(var, value);
 	}
 }
 }
