@@ -22,22 +22,24 @@ constraint count_commercial = n_commercial;
 array[GridRange] of var -5..5: rowScore;
 constraint forall (i in GridRange) (
     let {
-      var 0..n: count
-    } in 
-    count = sum(j in GridRange where houseType[i,j] == 1) (1)
+      var 0..n: residential
+    } in
+    count([houseType[i,j]|j in 1..n], 1, residential)
     /\
-    rowScore[i] = point_distribution[count]
+    rowScore[i] = point_distribution[residential]
 );
 
+
+constraint lex2(houseType);
 % Column score
 array[GridRange] of var -5..5: colScore;
 constraint forall (i in GridRange) (
     let {
-      var 0..n: count
-    } in 
-    count = sum(j in GridRange where houseType[j,i] == 1) (1)
+      var 0..n: residential
+    } in
+    count([houseType[j,i]|j in 1..n], 1, residential)
     /\
-    colScore[i] = point_distribution[count]
+    colScore[i] = point_distribution[residential]
 );
 
 
@@ -45,13 +47,33 @@ constraint forall (i in GridRange) (
 var 0..50: score = sum(rowScore) + sum(colScore);
 
 % Print solution
-output[show(houseType), "\n", show(score), "\n"];
+output [
+  "score: " ++ show(score) ++ "\n" ++
+  "rowScore: " ++ show(rowScore) ++ "\n" ++
+  "colScore: " ++ show(colScore) ++ "\n" ++ 
+  "houseTypes:"
+] ++
+[
+  if j = 1 then "\n" else " " endif ++
+    show(houseType[i,j])
+  | i,j in 1..n
+] ++
+["\n"]++
+[
+  if j = 1 then "\n" else " " endif ++
+    if fix(houseType[i,j]) == 1 then 
+     "R"
+    else 
+     "C"
+    endif
+  | i,j in 1..n
+];
 
 solve :: int_search(
    [houseType[i,j] | i,j in 1..n] ++
    rowScore ++ colScore, % ++ [x[i,j] | i,j in 1..n], 
-   first_fail, 
-   indomain_min, 
-   complete) 
+   first_fail,
+   indomain_min,
+   complete)
   % satisfy;
 maximize score;
