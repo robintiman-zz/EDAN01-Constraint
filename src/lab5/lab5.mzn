@@ -8,7 +8,6 @@ array[1..6] of var int: point_distribution = [-5, -4, -3, 3, 4, 5];
 set of int: GridRange = 1..n;
 set of int: HouseType = 1..2;
 
-var int: score; % Score of the solution
 array[GridRange,GridRange] of var HouseType: houseType;
 
 % Constrain number of residentials
@@ -20,29 +19,39 @@ var int: count_commercial = sum(i, j in GridRange where houseType[i,j] == 2)(1);
 constraint count_commercial = n_commercial;
 
 % Row score
-array[GridRange] of var int: rowScore;
+array[GridRange] of var -5..5: rowScore;
 constraint forall (i in GridRange) (
-    if sum(j in GridRange where houseType[i,j] == 1) (1) >= 3
-    then rowScore[i] = sum(j in GridRange where houseType[i,j] == 1) (1)
-    else rowScore[i] = sum(j in GridRange where houseType[i,j] == 2) (-1)
-    endif
+    let {
+      var 0..n: count
+    } in 
+    count = sum(j in GridRange where houseType[i,j] == 1) (1)
+    /\
+    rowScore[i] = point_distribution[count]
 );
 
 % Column score
-array[GridRange] of var int: colScore;
+array[GridRange] of var -5..5: colScore;
 constraint forall (i in GridRange) (
-    if sum(j in GridRange where houseType[j, i] == 1) (1) >= 3	
-    then colScore[i] = sum(j in GridRange where houseType[j, i] == 1) (1)
-    else colScore[i] = sum(j in GridRange where houseType[j, i] == 2) (-1)
-    endif
+    let {
+      var 0..n: count
+    } in 
+    count = sum(j in GridRange where houseType[j,i] == 1) (1)
+    /\
+    colScore[i] = point_distribution[count]
 );
 
+
 % Total score
-var int: temp1 = sum(i in rowScore)(rowScore[i]);
-var int: temp2 = sum(i in colScore) (colScore[i]);
-score = temp1 + temp2;
+var 0..50: score = sum(rowScore) + sum(colScore);
 
 % Print solution
 output[show(houseType), "\n", show(score), "\n"];
 
-solve maximize score;
+solve :: int_search(
+   [houseType[i,j] | i,j in 1..n] ++
+   rowScore ++ colScore, % ++ [x[i,j] | i,j in 1..n], 
+   first_fail, 
+   indomain_min, 
+   complete) 
+  % satisfy;
+maximize score;
