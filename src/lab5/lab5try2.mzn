@@ -1,16 +1,33 @@
 include "globals.mzn";
 
-int: n = 5;
-var int: n_commercial = 13;
-var int: n_residential = 12;
-array[0..5] of int: point_distribution =
-   array1d(0..5, [
-      -5, -4,-3, 3, 4, 5, % for residential
-    ]);
+% Example 1 (cost 14)
+% int: n = 5;
+% var int: n_commercial = 13;
+% var int: n_residential = 12;
+% array[0..5] of int: point_distribution =
+%    array1d(0..5, [
+%       -5, -4,-3, 3, 4, 5,
+%     ]);
+
+% Example 2 (cost 36)
+% int: n = 5;
+% var int: n_commercial = 7;
+% var int: n_residential = 18;
+% array[0..5] of int: point_distribution =
+%    array1d(0..5, [
+%       -5, -4,-3, 3, 4, 5,
+%     ]);
+
+% Example 3 (cost 58)
+int: n = 7;
+var int: n_commercial = 20;
+var int: n_residential = 29;
+array[0..7] of int: point_distribution =
+   array1d(0..7, [-7, -6, -5, -4, 4, 5, 6, 7]);
 
 array[1..n,1..n] of var 1..2: houseType;
-array[1..n] of var -5..5: rowScores;
-array[1..n] of var -5..5: colScores;
+array[1..n] of var -n..n: rowScores;
+array[1..n] of var -n..n: colScores;
 
 %  Count number of residentials in each row
 constraint forall (i in 1..n) (
@@ -35,10 +52,14 @@ constraint forall(i in 1..n) (
 );
 
 %  Set total score to rowScore + colScore
-var 0..50: score = sum(rowScores) + sum(colScores);
+var 0..100: score = sum(rowScores) + sum(colScores);
 
 %  Constrain number of residentials to n_residential
 constraint count([houseType[i,j]|i,j in 1..n], 1, n_residential);
+
+% Magic constraint
+constraint lex2(houseType);
+
 
 % Print solution
 output [

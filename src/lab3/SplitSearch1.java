@@ -29,6 +29,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+package lab3;
 
 import org.jacop.constraints.Not;
 import org.jacop.constraints.PrimitiveConstraint;
